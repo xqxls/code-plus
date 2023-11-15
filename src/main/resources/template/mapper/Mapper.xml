@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${package_mapper}.${Table}Mapper">
+
+    <resultMap type="${package_pojo}.${Table}" id="${table}Result">
+        <#list models as model>
+        <result property="${model.name}" column="${model.column}"/>
+        </#list>
+    </resultMap>
+
+    <sql id="baseColumn">
+        <#list models as model>
+        ${model.column}<#if model_has_next>,
+        </#if>
+        </#list>
+    </sql>
+
+    <insert id="addBatch">
+        insert into ${TableName}
+        (
+        <#list models as model>
+        ${model.column}<#if model_has_next>,</#if>
+        </#list>
+        ) values
+        <foreach collection="list" item="item" separator=",">
+        (
+        <#list models as model>
+        ${r'#{item.'}${model.name}${r'}'}<#if model_has_next>,</#if>
+        </#list>
+        )
+        </foreach>
+    </insert>
+</mapper>
